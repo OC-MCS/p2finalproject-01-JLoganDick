@@ -1,3 +1,7 @@
+//============================================================
+// File: EnemySet.cpp
+//        handels the List of Enemys 
+//============================================================
 #include "enemySet.h"
 
 EnemySet::EnemySet() {
@@ -15,7 +19,7 @@ void EnemySet::createEnemys(int level) {
 	float y = 30;
 	
 	for (int i = 0; i < 10; i++) {
-		Enemy badguy(enemyTexture, 4 * i * x, y, level);
+		Enemy badguy(enemyTexture, 3.7 * i * x, y, level);
 		hoard.push_back(badguy);
 	}
 }

@@ -20,6 +20,7 @@ public:
 	int getScore();
 	int getLives();
 	void setScore(int s);
+	void setLives(int l);
 
 
 };

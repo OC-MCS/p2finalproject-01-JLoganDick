@@ -16,5 +16,5 @@ public:
 	void move(float x, float y);
 	void draw(RenderWindow& window);
 	void outOfBounds();
-	void hit(EnemySet& enemies, userMenu &menu);
+	void hit(EnemySet& enemies, userMenu &menu, int i);
 };

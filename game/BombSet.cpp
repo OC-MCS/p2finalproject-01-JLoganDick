@@ -4,9 +4,9 @@ BombSet::BombSet() {
 
 }
 
-void BombSet::createBomb(Vector2f ailenPos) {
+void BombSet::createBomb(Vector2f enemyPos) {
 
-	Bomb bomb(bombTexture, ailenPos);
+	Bomb bomb(bombTexture, enemyPos);
 	bombs.push_back(bomb);
 
 }
@@ -59,17 +59,19 @@ bool BombSet::hit(Ship &ship, userMenu &menu) {
 	int index;
 	list<Bomb>::iterator iter;
 	bool hit = false;
-	for (iter = bombs.begin(); iter != bombs.end() && !hit;) {
-		hit = false;
+	for (iter = bombs.begin(); iter != bombs.end() && !hit;) {											// runs through the linked list of bombs
 
-		if ((iter)->getSprite().getGlobalBounds().intersects(ship.getSprite().getGlobalBounds())) {
-			iter = bombs.erase(iter);
+		if ((iter)->getSprite().getGlobalBounds().intersects(ship.getSprite().getGlobalBounds())) {		// cheks for intersection of bomb with ship
 			hit = true;
-			menu.loseLife();
+			menu.loseLife();																			// Decremints lives by 1
 		}
 		if (!hit) {
-			iter++;
+			iter++;																						// moves to next bomb if bomb didnt hit ship
 		}
 	}
 	return hit;
+}
+
+void BombSet::clear() {
+	bombs.clear();
 }

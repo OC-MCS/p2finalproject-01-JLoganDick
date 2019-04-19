@@ -43,10 +43,9 @@ void MissileSet::outOfBounds() {
 			iter++;
 		}
 	}
-
 }
 
-void MissileSet::hit(EnemySet &enemies, userMenu &menu) {
+void MissileSet::hit(EnemySet &enemies, userMenu &menu, int i) {
 	int index;
 	list<Missile>::iterator iter;
 	for (iter = bullets.begin(); iter != bullets.end(); ){
@@ -60,7 +59,7 @@ void MissileSet::hit(EnemySet &enemies, userMenu &menu) {
 					enemies.deleteEnemy(k);
 				}
 				else {
-					enemies.createEnemys(2);
+					enemies.createEnemys(i);
 					enemies.deleteEnemy(k);
 				}
 			}

@@ -1,9 +1,12 @@
-//=========================================================
-// This is just the starting point for your final project.
-// You are expected to modify and add classes/files as needed.
-// The code below is the original code for our first graphics
-// project (moving the little green ship). 
-//========================================================
+//============================================================
+// Logan Dick
+// April 19th, 2019
+// Programming Assignment #7
+// Description: Space Invaders
+// File: game.cpp
+//        main game file. 
+//        handels all animation rendering.
+//============================================================
 #include <iostream>
 using namespace std;
 #include <SFML/Graphics.hpp>
@@ -30,9 +33,7 @@ int main()
 {
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
-
-	bool enemyDirection = true;
-	bool start = false;
+	
 	int timer = 0;
 
 	enum gamestate {
@@ -63,14 +64,21 @@ int main()
 	background.setTexture(starsTexture);
 	background.setScale(1.5, 1.5);// The texture file is 640x480, so scale it up a little to cover 800x600 window
 
-	Enemy enemy();
-	EnemySet enemies;
-	enemies.createEnemys(1);
-	Ship ship(window, shipTexture);
-	MissileSet missiles;
-	BombSet bombs;
+	Enemy enemy();					    // Class holds the Sprite for the enemy
+	EnemySet enemies;					// Class holds the linked list of Enemys
+	Ship ship(window, shipTexture);		// Class holds the sprite for the Ship
+	MissileSet missiles;				// Class holds the link list of Missiles
+	BombSet bombs;						// 
+
+	enemies.createEnemys(1);			// populates the linked list in EnemySet with Enemys
 
 	userMenu menu(WINDOW_WIDTH,WINDOW_HEIGHT);
+
+	//===========================================================
+	// Everything from here to the end of the loop is where you put your
+	// code to produce ONE frame of the animation. The next iteration of the loop will
+	// render the next frame, and so on. All this happens ~ 60 times/second.
+	//===========================================================
 
 	while (window.isOpen())
 	{
@@ -93,12 +101,6 @@ int main()
 				}
 			}
 		}
-		
-		//===========================================================
-		// Everything from here to the end of the loop is where you put your
-		// code to produce ONE frame of the animation. The next iteration of the loop will
-		// render the next frame, and so on. All this happens ~ 60 times/second.
-		//===========================================================
 
 		window.draw(background); // draw background first, so everything that's drawn later will appear on top of background
 
@@ -110,94 +112,103 @@ int main()
 					game = LEVEL1;
 				}
 			}
-
 		}
 		else if (game == LEVEL1) {
-			ship.moveShip();
-			enemies.moveEnemy();
-			missiles.move(0, -5.0f);
-			bombs.move(0, 3);
-
 			bombs.randBomb(enemies, timer);
 
-			missiles.outOfBounds();
-			missiles.hit(enemies, menu);
+			ship.moveShip();									
+			enemies.moveEnemy();								
+			missiles.move(0, -5.0f);								
+			bombs.move(0, 3);									
 
-			menu.drawGame(window);
-			ship.draw(window);
-			enemies.draw(window);
-			missiles.draw(window);
-			bombs.draw(window);
+			missiles.outOfBounds();									
+			missiles.hit(enemies, menu, 1);							
 
-			if (bombs.hit(ship, menu)|| enemies.toLow(menu)) {
-				enemies.createEnemys(1);
-				menu.setScore(0);
+			menu.drawGame(window);								
+			ship.draw(window);										
+			enemies.draw(window);									
+			missiles.draw(window);								
+			bombs.draw(window);									
+
+			if (bombs.hit(ship, menu)|| enemies.toLow(menu)) {		
+				enemies.createEnemys(1);						
+				menu.setScore(0);									
+				bombs.clear();										
 			}
-			if (menu.getScore() >= 10) {
-				game = LEVEL2START;
-				menu.setScore(0);
+			if (menu.getScore() >= 10) {							
+				game = LEVEL2START;									
+				menu.setScore(0);									
+				enemies.createEnemys(2);							
 			}
-			if (menu.getLives() <= 0) {
-				game = LOSER;
+			if (menu.getLives() <= 0) {								
+				game = LOSER;										
 			}
 
 		}
-		else if (game == LEVEL2START) {
-			menu.draw(window, 2);
-			if (event.type == Event::MouseButtonReleased) {
+		else if (game == LEVEL2START) {								
+			menu.draw(window, 2);									
+			if (event.type == Event::MouseButtonReleased) {			
 				Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				if (menu.handelMouseUp(mousePos)) {
-					game = LEVEL2;
+				if (menu.handelMouseUp(mousePos)) {					
+					game = LEVEL2;									
 				}
 			}
 
 		}
 		else if (game == LEVEL2){
-			ship.moveShip();
-			enemies.moveEnemy();
-			enemies.moveEnemy();
-			missiles.move(0, -4.0f);
-			bombs.move(0, 4);
+			ship.moveShip();									
+			enemies.moveEnemy();								
+			enemies.moveEnemy();								
+			missiles.move(0, -4.0f);							
+			bombs.move(0, 4);									
 
-			bombs.randBomb(enemies, timer);
+			bombs.randBomb(enemies, timer);						
 
-			missiles.outOfBounds();
-			missiles.hit(enemies, menu);
+			missiles.outOfBounds();									
+			missiles.hit(enemies, menu, 2);							
 
-			menu.drawGame(window);
-			ship.draw(window);
-			enemies.draw(window);
-			missiles.draw(window);
-			bombs.draw(window);
+			menu.drawGame(window);									
+			ship.draw(window);										
+			enemies.draw(window);									
+			missiles.draw(window);									
+			bombs.draw(window);										
 
-			if (bombs.hit(ship, menu) || enemies.toLow(menu)) {
-				enemies.createEnemys(2);
-				menu.setScore(0);
+			if (bombs.hit(ship, menu) || enemies.toLow(menu)) {		
+				enemies.createEnemys(2);							
+				menu.setScore(0);									//  sets score to 0 to reset level
 			}
-			if (menu.getScore() >= 10) {
-				game = WINNER;
+			if (menu.getScore() >= 10) {							// Gets score to see if you won
+				game = WINNER;										// Sets game state to Loser
 			}
-			if (menu.getLives() <= 0) {
-				game = LOSER;
+			if (menu.getLives() <= 0) {								// Gets lives to see if you lost
+				game = LOSER;										// Sets gamestate to Loser
 			}
 		}
-		else if (game == WINNER) {
-			menu.draw(window, 4);
+		else if (game == WINNER) {									// If you win you go here.
+			menu.draw(window, 4);									// Draws the winner page
+			if (event.type == Event::MouseButtonReleased) {			// restarts the game if button is clicked (checks button)
+				Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				if (menu.handelMouseUp(mousePos)) {					
+					game = LEVEL1;									//Sets the gameState to level 1 to restart the game
+					menu.setScore(0);								//Sets the score back to 0 to restart the game
+					menu.setLives(3);								// Sets lives back to 3 to restart the game
+				}
+			}
 		}
-		else if (game == LOSER) {
-			menu.draw(window, 3);
+		else if (game == LOSER) {									// If you lose, go here.
+			menu.draw(window, 3);									// draws the Loser page
+			if (event.type == Event::MouseButtonReleased) {			// restarts the game if button is clicked (checks button)
+				Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				if (menu.handelMouseUp(mousePos)) {					
+					game = LEVEL1;									// Sets the gameState to level 1 to restart the game
+					menu.setScore(0);								// Sets the score back to 0 to restart the game
+					menu.setLives(3);								// Sets lives back to 3 to restart the game
+				}
+			}
 		}
 
-		// end the current frame; this makes everything that we have 
-		// already "drawn" actually show up on the screen
-		window.display();
-
-		// At this point the frame we have built is now visible on screen.
-		// Now control will go back to the top of the animation loop
-		// to build the next frame. Since we begin by drawing the
-		// background, each frame is rebuilt from scratch.
-
-	} // end body of animation loop
+		window.display();											//end the current frame; this makes everything that we have already "drawn" actually show up on the screen
+	}																// end body of animation loop
 
 	return 0;
 }

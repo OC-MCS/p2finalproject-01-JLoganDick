@@ -46,14 +46,23 @@ void userMenu::draw(RenderWindow& win, int i) {
 	else if (i == 3) {
 		Text title2("YOU LOSE!", font, 50);
 		title2.setFillColor(Color::White);
-		title2.setPosition((win.getSize().x - title2.getLocalBounds().width) / 2, (win.getSize().y - title2.getLocalBounds().height) / 2);
+		title2.setPosition(button.getPosition().x + (button.getSize().x - title2.getLocalBounds().width) / 2, 20);
 		win.draw(title2);
 	}
 	else if (i == 4) {
 		Text title2("WINNER!!", font, 50);
 		title2.setFillColor(Color::White);
-		title2.setPosition((win.getSize().x - title2.getLocalBounds().width) / 2, (win.getSize().y - title2.getLocalBounds().height) / 2);
+		title2.setPosition(button.getPosition().x + (button.getSize().x - title2.getLocalBounds().width) / 2, 20);
 		win.draw(title2);
+	}
+
+	if (i > 2) {
+		win.draw(button);
+
+		Text title("START", font, 50);
+		title.setFillColor(Color::Black);
+		title.setPosition(button.getPosition().x + (button.getSize().x - title.getLocalBounds().width) / 2, button.getPosition().y + button.getSize().y / 2 - title.getLocalBounds().height);
+		win.draw(title);
 	}
 
 }
@@ -111,4 +120,8 @@ int userMenu::getLives() {
 
 void userMenu::setScore(int s) {
 	score = s;
+}
+
+void userMenu::setLives(int l) {
+	lives = l;
 }

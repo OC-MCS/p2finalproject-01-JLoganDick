@@ -13,10 +13,11 @@ private:
 	Texture bombTexture;
 public:
 	BombSet();
-	void createBomb(Vector2f shipPos);
+	void createBomb(Vector2f enemyPos);
 	void move(float x, float y);
 	void draw(RenderWindow& window);
 	void outOfBounds();
 	void randBomb(EnemySet &es, int &timer);
 	bool hit(Ship& ship, userMenu &menu);
+	void clear();
 };
