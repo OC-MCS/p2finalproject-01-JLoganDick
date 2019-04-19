@@ -6,14 +6,20 @@ using namespace sf;
 
 class userMenu {
 private:
-	int level;
 	RectangleShape button;
+	int score;
 	int lives;
-	int kills;
 public:
 	userMenu(int windowX, int windowY);
 	RectangleShape getButton();
 	bool handelMouseUp(Vector2f mousePos);
-	void draw(RenderWindow& win);
+	void draw(RenderWindow& win, int i);
+	void addScore();
+	void loseLife();
+	void drawGame(RenderWindow& win);
+	int getScore();
+	int getLives();
+	void setScore(int s);
+
 
 };

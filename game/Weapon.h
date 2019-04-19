@@ -10,14 +10,14 @@ private:
 	Sprite weapon;
 
 public:
-	Weapon(Texture& weaponTexture);
+	Weapon(Texture& weaponTexture, Vector2f shipPos);
 	void setWeaponPosition(Vector2f here);
-	virtual void shootWeapon() {};
 	void draw(RenderWindow& win);
-	void move(float i, float j);
+	void move(float x, float y);
 	Vector2f getPosition();
 	FloatRect getGlobalBounds();
 	void setPosition(float x, float y);
+	Sprite getSprite();
 };
 
 
@@ -26,8 +26,7 @@ class Missile: public Weapon
 private:
 
 public:
-	Missile(Texture& missileTexture);
-	void shootWeapon(bool& isMissileInFlight, Sprite ship, Event event);
+	Missile(Texture& missileTexture, Vector2f pos);
 };
 
 
@@ -37,7 +36,6 @@ private:
 
 
 public:
-	void shootWeapon();
-
-
+	Bomb(Texture& bombTexture, Vector2f enemyPos);
+	int begin();
 };

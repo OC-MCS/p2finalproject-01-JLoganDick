@@ -10,6 +10,10 @@ using namespace std;
 #include "userMenu.h"
 #include "Ship.h"
 #include "Weapon.h"
+#include "Enemy.h"
+#include "enemySet.h"
+#include "MissileSet.h"
+#include "bombSet.h"
 using namespace sf;
 
 //============================================================
@@ -22,23 +26,6 @@ using namespace sf;
 // x is horizontal, y is vertical. 
 // 0,0 is in the UPPER LEFT of the screen, y increases DOWN the screen
 
-
-void moveEnemy(Sprite& enemy, bool& enemyDirection) {
-	const float DISTANCE = 9.0f;
-	if (enemy.getPosition().x < 0) {
-		enemyDirection = true;
-	}
-	if (enemy.getPosition().x > 750) {
-		enemyDirection = false;
-	}
-	if (enemyDirection) {
-		enemy.move(DISTANCE, 0);
-	}
-	if (!enemyDirection) {
-		enemy.move(-DISTANCE, 0);
-	}
-}
-
 int main()
 {
 	const int WINDOW_WIDTH = 800;
@@ -46,6 +33,12 @@ int main()
 
 	bool enemyDirection = true;
 	bool start = false;
+	int timer = 0;
+
+	enum gamestate {
+		START, LEVEL1,LEVEL2START, LEVEL2, WINNER, LOSER
+	};
+	gamestate game = START;
 
 	RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "aliens!");
 	// Limit the framerate to 60 frames per second
@@ -65,113 +58,136 @@ int main()
 		cout << "Unable to load stars texture!" << endl;
 		exit(EXIT_FAILURE);
 	}
-	Texture missileTexture;
-	if (!missileTexture.loadFromFile("missile.png"))
-	{
-		cout << "Unable to load missile texture!" << endl;
-		exit(EXIT_FAILURE);
-	}
-	Texture enemyTexture;
-	if (!enemyTexture.loadFromFile("enemy.png"))
-	{
-		cout << "Unable to load enemy texture!" << endl;
-		exit(EXIT_FAILURE);
-	}
-
-	// A sprite is a thing we can draw and manipulate on the screen.
-	// We have to give it a "texture" to specify what it looks like
 
 	Sprite background;
 	background.setTexture(starsTexture);
-	// The texture file is 640x480, so scale it up a little to cover 800x600 window
-	background.setScale(1.5, 1.5);
+	background.setScale(1.5, 1.5);// The texture file is 640x480, so scale it up a little to cover 800x600 window
 
-	Sprite enemy;
-	enemy.setTexture(enemyTexture);
-
+	Enemy enemy();
+	EnemySet enemies;
+	enemies.createEnemys(1);
 	Ship ship(window, shipTexture);
-
-	Missile missile(missileTexture);
-	
+	MissileSet missiles;
+	BombSet bombs;
 
 	userMenu menu(WINDOW_WIDTH,WINDOW_HEIGHT);
 
-	float enemyX = window.getSize().x / 2.0f;
-	float enemyY = window.getSize().y / 5.0f;
-	enemy.setPosition(enemyX, enemyY);
-
-	bool isMissileInFlight = false;
-	int hitcount = 0;
-
 	while (window.isOpen())
 	{
-		// check all the window's events that were triggered since the last iteration of the loop
-		// For now, we just need this so we can click on the window and close it
-		Event event;
+		Event event; // check all the window's events that were triggered since the last iteration of the loop
 		
 
 		while (window.pollEvent(event))
 		{
-			// "close requested" event: we close the window
-			if (event.type == Event::Closed)
+			if (event.type == Event::Closed) // "close requested" event: we close the window
 				window.close();
 			else {
-				missile.shootWeapon(isMissileInFlight, ship.getShip(), event);
+				if (event.type == Event::KeyPressed)
+				{
+					if (event.key.code == Keyboard::Space)
+					{
+						Vector2f pos = ship.getPosition();
+						missiles.createMissile(pos);
+					}
+
+				}
 			}
 		}
-
+		
 		//===========================================================
 		// Everything from here to the end of the loop is where you put your
 		// code to produce ONE frame of the animation. The next iteration of the loop will
 		// render the next frame, and so on. All this happens ~ 60 times/second.
 		//===========================================================
 
-		// draw background first, so everything that's drawn later 
-		// will appear on top of background
-		window.draw(background);
+		window.draw(background); // draw background first, so everything that's drawn later will appear on top of background
 
-		if (!start) {
-			menu.draw(window);
+		if (game == START) {
+			menu.draw(window, 1);
 			if (event.type == Event::MouseButtonReleased) {
 				Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				start = menu.handelMouseUp(mousePos);
-			}
-			// check start click
-			// draw start button
-
-		}
-		else {
-			ship.moveShip();
-			moveEnemy(enemy, enemyDirection);
-
-			// draw the ship on top of background 
-			// (the ship from previous frame was erased when we drew background)
-			//ship.draw(window);
-			//window.draw(ship.getShip());
-			ship.draw(window);
-			window.draw(enemy);
-
-			if (isMissileInFlight)
-			{
-				missile.draw(window);
-				missile.move(0, -5.0f);
-				Vector2f misPos = missile.getPosition();
-				if (misPos.y < 0) {
-					isMissileInFlight = false;
+				if (menu.handelMouseUp(mousePos)) {
+					game = LEVEL1;
 				}
-				// ***code goes here to handle a missile in flight
-				// don't forget to turn the flag off when the missile goes off screen!
-
 			}
 
-			FloatRect missileBounds = missile.getGlobalBounds();
-			FloatRect enemyBounds = enemy.getGlobalBounds();
-			if (missileBounds.intersects(enemyBounds)) {
-				hitcount++;
-				cout << "The enemy has been hit!" << endl;
-				missile.setPosition(-1, -1);
+		}
+		else if (game == LEVEL1) {
+			ship.moveShip();
+			enemies.moveEnemy();
+			missiles.move(0, -5.0f);
+			bombs.move(0, 3);
+
+			bombs.randBomb(enemies, timer);
+
+			missiles.outOfBounds();
+			missiles.hit(enemies, menu);
+
+			menu.drawGame(window);
+			ship.draw(window);
+			enemies.draw(window);
+			missiles.draw(window);
+			bombs.draw(window);
+
+			if (bombs.hit(ship, menu)|| enemies.toLow(menu)) {
+				enemies.createEnemys(1);
+				menu.setScore(0);
+			}
+			if (menu.getScore() >= 10) {
+				game = LEVEL2START;
+				menu.setScore(0);
+			}
+			if (menu.getLives() <= 0) {
+				game = LOSER;
+			}
+
+		}
+		else if (game == LEVEL2START) {
+			menu.draw(window, 2);
+			if (event.type == Event::MouseButtonReleased) {
+				Vector2f mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				if (menu.handelMouseUp(mousePos)) {
+					game = LEVEL2;
+				}
+			}
+
+		}
+		else if (game == LEVEL2){
+			ship.moveShip();
+			enemies.moveEnemy();
+			enemies.moveEnemy();
+			missiles.move(0, -4.0f);
+			bombs.move(0, 4);
+
+			bombs.randBomb(enemies, timer);
+
+			missiles.outOfBounds();
+			missiles.hit(enemies, menu);
+
+			menu.drawGame(window);
+			ship.draw(window);
+			enemies.draw(window);
+			missiles.draw(window);
+			bombs.draw(window);
+
+			if (bombs.hit(ship, menu) || enemies.toLow(menu)) {
+				enemies.createEnemys(2);
+				menu.setScore(0);
+			}
+			if (menu.getScore() >= 10) {
+				game = WINNER;
+			}
+			if (menu.getLives() <= 0) {
+				game = LOSER;
 			}
 		}
+		else if (game == WINNER) {
+			menu.draw(window, 4);
+		}
+		else if (game == LOSER) {
+			menu.draw(window, 3);
+		}
+
 		// end the current frame; this makes everything that we have 
 		// already "drawn" actually show up on the screen
 		window.display();
@@ -182,8 +198,6 @@ int main()
 		// background, each frame is rebuilt from scratch.
 
 	} // end body of animation loop
-
-	cout << "You hit the enemy " << hitcount << " times!!" << endl;
 
 	return 0;
 }

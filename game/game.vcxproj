@@ -146,6 +146,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BombSet.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemySet.cpp" />
+    <ClCompile Include="MissileSet.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="userMenu.cpp" />
@@ -158,6 +162,10 @@
     <Image Include="..\..\..\..\Desktop\classes\Programing II\labs\Lab05_Tasks%281%29 %282%29\Lab05_Tasks\game\enemy.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bombSet.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="enemySet.h" />
+    <ClInclude Include="MissileSet.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="userMenu.h" />

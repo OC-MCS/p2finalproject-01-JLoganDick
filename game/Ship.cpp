@@ -1,15 +1,14 @@
 #include "Ship.h"
+#include "Weapon.h"
+#include <list>
 
 Ship::Ship(RenderWindow& win, Texture& shipTexture) {
 	
-
 	ship.setTexture(shipTexture);
 
-	// initial position of the ship will be approx middle of screen
 	float shipX = win.getSize().x / 2.0f;
 	float shipY = win.getSize().y / 1.2f;
 	ship.setPosition(shipX, shipY);
-	lives = 1;
 }
 
 void Ship::draw(RenderWindow& win) {
@@ -40,4 +39,8 @@ void Ship::moveShip() {
 
 Vector2f Ship::getPosition() {
 	return ship.getPosition();
+}
+
+Sprite Ship::getSprite() {
+	return ship;
 }
